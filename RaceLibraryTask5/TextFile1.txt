@@ -1,0 +1,99 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Drawing;
+using System.Threading.Tasks;
+
+namespace RaceLibraryTask5
+{
+    public class ReparingLoader : ILoader
+    {
+        object locker = new object();
+        static Mutex mutex = new Mutex();
+        public string Name { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
+        public int TrackHeight { get; set; }
+        public int TrackWidth { get; set; }
+        public Queue<Bolide> CrashedBolides { get; set; }
+        private bool OnWayToHome { get; set; } = false;
+
+        public ReparingLoader(List<Bolide> bolides, string Name)
+        {
+            this.Name = Name;
+            CrashedBolides = new Queue<Bolide>();
+            foreach (Bolide b in bolides)
+            { 
+                b.RequestRepair += AddCrashedBolide;
+            }
+        }
+
+        public void AddCrashedBolide(Bolide b)
+        {
+            lock (locker)
+                if (b != null)
+                    CrashedBolides.Enqueue(b);
+        }
+
+        public void FixBolide(Bolide Bolide)
+        {
+            if (!Bolide.Crashed || Bolide.Q) return;
+
+            Bolide.Q = true;
+                if (!OnWayToHome)
+                    X = Bolide.X;
+            //mutex.WaitOne();
+            while (Y > Bolide.Y && Bolide.Crashed && !OnWayToHome)
+            {
+                int speed = RaceConfig.rnd.Next(5);
+                Y -= speed;
+                Thread.Sleep(5);
+
+                if (Math.Abs(Y - Bolide.Y) < 10)
+                {
+                    int time = RaceConfig.rnd.Next(100, 1000);
+                    Bolide.WaitingTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                    Thread.Sleep(time);
+                    Bolide.Crashed = false;
+                    Bolide.Arguing = false;
+                    Bolide.Q = false;
+                    OnWayToHome = true;
+                    break;
+                }
+            }
+            while (Y < TrackHeight + 110 && OnWayToHome)
+            {
+                int speed = 5;
+                Y += speed;
+                Thread.Sleep(5);
+            }
+            Y = TrackHeight + 110;
+            OnWayToHome = false;
+            //mutex.ReleaseMutex();
+        }
+
+        public void SetPosition(int TrackWidth, int TrackHeight)
+        {
+            this.TrackWidth = TrackWidth;
+            this.TrackHeight = TrackHeight;
+
+            Y = TrackHeight;
+            X = 0;
+        }
+
+        public void Repair()
+        {
+            while (true)
+            {
+               if (CrashedBolides.Count > 0)
+               {
+                    Bolide b = CrashedBolides.Dequeue();
+                    if (b != null)
+                        FixBolide(b);
+               }
+            }
+        }
+    }
+}
