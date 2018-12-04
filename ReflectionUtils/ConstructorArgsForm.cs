@@ -21,7 +21,15 @@ namespace ReflectionUtils
 
         private void OKBTN_Click(object sender, EventArgs e)
         {
-            DialogResult = DialogResult.OK;
+            try
+            {
+                GetSelectedConstructorInfo.Invoke(GetArguments);
+                DialogResult = DialogResult.OK;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         public ConstructorInfo GetSelectedConstructorInfo

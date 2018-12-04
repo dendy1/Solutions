@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ReflectionLibrary;
 using System.Windows.Forms;
 using System.Reflection;
 using ReflectionUtils;
@@ -43,14 +42,9 @@ namespace Reflection
         
         private void methodBTN_Click(object sender, EventArgs e)
         {
-            if (MethodsOutputListVox.SelectedIndex == -1)
-            {
-                MessageBox.Show("Выберите метод!");
-                return;
-            }
             if (objectListBox.SelectedIndex == -1)
             {
-                MessageBox.Show("Сначала создайте объект!");
+                MessageBox.Show("Сначала создайте или выберите объект!");
                 return;
             }
 
@@ -60,6 +54,7 @@ namespace Reflection
 
             MethodArgsForm methodArgsForm = new MethodArgsForm();
             methodArgsForm.MethodInfo = currentMethod;
+            methodArgsForm.Object = objectListBox.SelectedItem;
             object methodResult = null;
             try
             {
@@ -82,10 +77,10 @@ namespace Reflection
             }
             catch (TargetInvocationException ex)
             {
-                if (ex.InnerException is NotImplementedException)
-                {
-                    MessageBox.Show(ex.Message);
-                }
+                //if (ex.InnerException is NotImplementedException)
+                //{
+                    MessageBox.Show(ex.InnerException.Message);
+                //}
             }
             catch (Exception ex)
             {
@@ -96,7 +91,7 @@ namespace Reflection
 
         private void createObjectBTN_Click(object sender, EventArgs e)
         {
-            if (ClassesOutputListBox.SelectedItem == null)
+            if (ClassesOutputListBox.SelectedIndex == -1)
             {
                 MessageBox.Show("Выберите класс!");
                 return;
@@ -124,6 +119,11 @@ namespace Reflection
 
         private void OutputListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (ClassesOutputListBox.SelectedIndex == -1)
+            {
+                MessageBox.Show("Выберите класс!");
+                return;
+            }
             Type currentClass = classes[ClassesOutputListBox.SelectedIndex];
             MethodsOutputListVox.Items.Clear();
             if (ClassesOutputListBox.SelectedIndex != -1)
@@ -143,10 +143,12 @@ namespace Reflection
 
         private void objectListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (objectListBox.SelectedItem != null)
+            if (objectListBox.SelectedIndex == -1)
             {
-                RefreshInfo();
+                MessageBox.Show("Сначала создайте или выберите объект!");
+                return;
             }
+            RefreshInfo();
         }
 
         private void RefreshInfo()
@@ -162,6 +164,25 @@ namespace Reflection
             }
             catch (Exception ex)
             { MessageBox.Show(ex.Message); }
+        }
+
+        private void CheckSelected()
+        {
+            if (ClassesOutputListBox.SelectedIndex == -1)
+            {
+                MessageBox.Show("Выберите класс!");
+                return;
+            }
+            if (MethodsOutputListVox.SelectedIndex == -1)
+            {
+                MessageBox.Show("Выберите метод!");
+                return;
+            }
+            if (objectListBox.SelectedIndex == -1)
+            {
+                MessageBox.Show("Сначала создайте или выберите объект!");
+                return;
+            }
         }
     }
 }

@@ -13,6 +13,7 @@ namespace ReflectionUtils
 {
     public partial class MethodArgsForm : Form
     {
+        public object Object { get; set; }
         public MethodInfo MethodInfo { get; set; }
         public MethodArgsForm()
         {
@@ -21,7 +22,14 @@ namespace ReflectionUtils
 
         private void OKBTN_Click(object sender, EventArgs e)
         {
-            DialogResult = DialogResult.OK;
+            try
+            {
+                DialogResult = DialogResult.OK;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         public object[] GetArguments

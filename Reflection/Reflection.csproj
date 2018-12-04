@@ -79,10 +79,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ReflectionLibrary\ReflectionLibrary.csproj">
-      <Project>{8411d4a9-ce07-49dd-a265-77a71041ddb5}</Project>
-      <Name>ReflectionLibrary</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ReflectionUtils\ReflectionUtils.csproj">
       <Project>{f36ad045-e360-4967-8efb-0f0c7a3e1cc7}</Project>
       <Name>ReflectionUtils</Name>
